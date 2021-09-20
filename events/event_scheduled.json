@@ -1,0 +1,13 @@
+{
+  "version": "0",
+  "id": "4c42e8c7-60c4-726d-1e39-fb275f84c820",
+  "detail-type": "Scheduled Event",
+  "source": "aws.events",
+  "account": "905234897161",
+  "time": "2021-09-13T07:00:00Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:events:us-east-1:905234897161:rule/SqlParserScheduleEvent"
+  ],
+  "detail": {}
+}

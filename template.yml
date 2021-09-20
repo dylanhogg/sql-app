@@ -1,0 +1,136 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+# https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md
+
+Description: >
+  Sql Parser API infrastructure. R53, Cert, LambdaFunction, DynamoTable, Scheduled EventRule.
+
+Parameters:
+  AppName:
+    Type: String
+    Default: "SqlParser"
+  DomainName:
+    Type: String
+    Default: "sql-api.infocruncher.com"
+  HostedZoneName:
+    Type: String
+    Default: "infocruncher.com."
+  FunctionName:
+    Type: String
+    Default: "SqlParserInferenceFunction"
+  TableName:
+    Type: String
+    Default: "SqlParserInferenceFunctionUsage"
+
+Globals:
+  Function:
+    Timeout: 25
+    MemorySize: 1769  # 1769 = 1 vCPU
+    ReservedConcurrentExecutions: 20
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref TableName
+
+Resources:
+  InferenceApiCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      ValidationMethod: DNS
+
+  InferenceApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Ref DomainName
+      StageName: Prod
+      TracingEnabled: true
+      # EndpointConfiguration: REGIONAL
+      Cors:  # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-api-corsconfiguration.html
+        AllowMethods: "'POST, GET'"
+        AllowHeaders: "'X-Forwarded-For'"
+        AllowOrigin: "'*'"
+        MaxAge: "'600'"
+        # AllowCredentials: true
+      Domain:
+        DomainName: !Ref DomainName
+        CertificateArn: !Ref InferenceApiCertificate
+        Route53:
+          HostedZoneName: !Ref HostedZoneName
+      Tags:
+        App: !Ref AppName
+
+  InferenceFunction:
+    # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html
+    # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      FunctionName: !Ref FunctionName
+      Description: !Join
+        - ""
+        - - "Function for "
+          - !Ref DomainName
+      Tags:
+        App: !Ref AppName
+      Policies:
+        DynamoDBWritePolicy:
+          TableName: !Ref InferenceTable
+      Events:
+        Inference:
+          # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-property-function-api.html
+          # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Type: Api
+          Properties:
+            RestApiId: !Ref InferenceApi
+            Path: /predict
+            Method: post
+        ScheduledEvent:
+          # https://github.com/aws/serverless-application-model/blob/master/versions/2016-10-31.md#schedule
+          # https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html
+          Type: Schedule
+          Properties:
+            Name: !Join
+              - ""
+              - - !Ref AppName
+                - "ScheduleEvent"
+            Schedule: cron(0/15 * * * ? *)  # (0/15 * * * ? *) is every 15 mins.
+            Description: !Join
+              - ""
+              - - !Ref FunctionName
+                - "Function Keep Warm Schedule"
+            Enabled: True
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./app
+      DockerTag: python3.8-v1
+
+  InferenceTable:
+    # https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-simpletable.html
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: requestId
+        Type: String
+      TableName: !Ref TableName
+      Tags:
+        App: !Ref AppName
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  InferenceApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage for Inference function"
+    Value: !Sub "https://${InferenceApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/predict/"
+  InferenceApiId:
+    Description: 'API Gateway ARN for InferenceApi'
+    Value: !Ref InferenceApi
+  BasicAWSApiGatewayRootResourceId:
+    Description: 'API Gateway RootResourceId for InferenceApi'
+    Value: !GetAtt InferenceApi.RootResourceId
+  InferenceFunction:
+    Description: "Inference Lambda Function ARN"
+    Value: !GetAtt InferenceFunction.Arn
+  TableName:
+    Description: "Dynamo Table ARN"
+    Value: !GetAtt InferenceTable.Arn

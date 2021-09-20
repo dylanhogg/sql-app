@@ -1,0 +1,113 @@
+{
+  "resource":"/predict",
+  "path":"/predict/",
+  "httpMethod":"POST",
+  "headers":{
+    "accept":"*/*",
+    "accept-encoding":"gzip, deflate, br",
+    "accept-language":"en-GB,en-US;q=0.9,en;q=0.8",
+    "content-type":"application/x-www-form-urlencoded; charset=UTF-8",
+    "Host":"sql-api.infocruncher.com",
+    "origin":"https://sql-app.infocruncher.com",
+    "referer":"https://sql-app.infocruncher.com/",
+    "sec-ch-ua":"\"Chromium\";v=\"92\", \" Not A;Brand\";v=\"99\", \"Google Chrome\";v=\"92\"",
+    "sec-ch-ua-mobile":"?0",
+    "sec-fetch-dest":"empty",
+    "sec-fetch-mode":"cors",
+    "sec-fetch-site":"same-site",
+    "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36",
+    "X-Amzn-Trace-Id":"Root=1-613ed161-4df1a520796b864b55891034",
+    "X-Forwarded-For":"101.184.141.16",
+    "X-Forwarded-Port":"443",
+    "X-Forwarded-Proto":"https"
+  },
+  "multiValueHeaders":{
+    "accept":[
+      "*/*"
+    ],
+    "accept-encoding":[
+      "gzip, deflate, br"
+    ],
+    "accept-language":[
+      "en-GB,en-US;q=0.9,en;q=0.8"
+    ],
+    "content-type":[
+      "application/x-www-form-urlencoded; charset=UTF-8"
+    ],
+    "Host":[
+      "sql-api.infocruncher.com"
+    ],
+    "origin":[
+      "https://sql-app.infocruncher.com"
+    ],
+    "referer":[
+      "https://sql-app.infocruncher.com/"
+    ],
+    "sec-ch-ua":[
+      "\"Chromium\";v=\"92\", \" Not A;Brand\";v=\"99\", \"Google Chrome\";v=\"92\""
+    ],
+    "sec-ch-ua-mobile":[
+      "?0"
+    ],
+    "sec-fetch-dest":[
+      "empty"
+    ],
+    "sec-fetch-mode":[
+      "cors"
+    ],
+    "sec-fetch-site":[
+      "same-site"
+    ],
+    "User-Agent":[
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36"
+    ],
+    "X-Amzn-Trace-Id":[
+      "Root=1-613ed161-4df1a520796b864b55891034"
+    ],
+    "X-Forwarded-For":[
+      "101.184.141.16"
+    ],
+    "X-Forwarded-Port":[
+      "443"
+    ],
+    "X-Forwarded-Proto":[
+      "https"
+    ]
+  },
+  "queryStringParameters":"None",
+  "multiValueQueryStringParameters":"None",
+  "pathParameters":"None",
+  "stageVariables":"None",
+  "requestContext":{
+    "resourceId":"f78mrk",
+    "resourcePath":"/predict",
+    "httpMethod":"POST",
+    "extendedRequestId":"FlWnVH_roAMFuGQ=",
+    "requestTime":"13/Sep/2021:04:19:45 +0000",
+    "path":"/predict/",
+    "accountId":"905234897161",
+    "protocol":"HTTP/1.1",
+    "stage":"Prod",
+    "domainPrefix":"sql-api",
+    "requestTimeEpoch":1631506785987,
+    "requestId":"6a7fec00-e417-4447-9548-d9819ace6d57",
+    "identity":{
+      "cognitoIdentityPoolId":"None",
+      "accountId":"None",
+      "cognitoIdentityId":"None",
+      "caller":"None",
+      "sourceIp":"101.184.141.16",
+      "principalOrgId":"None",
+      "accessKey":"None",
+      "cognitoAuthenticationType":"None",
+      "cognitoAuthenticationProvider":"None",
+      "userArn":"None",
+      "userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36",
+      "user":"None"
+    },
+    "domainName":"sql-api.infocruncher.com",
+    "apiId":"fhfgcueidf"
+  },
+  "body":"{\"query\": \"SELECT test, id FROM foo, bar\"}",
+  "isBase64Encoded":false
+}

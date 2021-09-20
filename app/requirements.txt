@@ -1,0 +1,1 @@
+sql-metadata==2.3.0
