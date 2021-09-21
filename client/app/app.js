@@ -2,8 +2,9 @@ const version = "v1.0.0";
 const predictionUrl = "https://sql-api.infocruncher.com/predict/";
 const randomInputs = [
         "SELECT test, id FROM foo, bar",
-        "SELECT * FROM foo",
-        "SELECT a.* FROM product_a.users AS a JOIN product_b.users AS b ON a.ip_address = b.ip_address",
+        "SELECT * FROM foo LIMIT 10 OFFSET 100",
+        "SELECT a.* FROM product_a.users AS a\nJOIN product_b.users AS b\nON a.ip_address = b.ip_address",
+        "SELECT t1.*, t2.* FROM table1 t1\nLEFT JOIN table2 t2 on t1.id = t2.id",
         "SELECT f.test FROM foo AS f"
     ]
 
@@ -25,14 +26,24 @@ $(document).ready(function () {
 
     $("#view-debug-info").click(function(){
         $("#debug-response").toggle();
+        return false;
     });
 
-    $("#input-text").keypress(function (e) {
-      if (e.which == 13) {
-        $("#input-button").click();
+    $("#view-about-info").click(function(){
+        var about = "Sql Query Parser App by Dylan Hogg\n" +
+        "<a href='https://sql-app.infocruncher.com/'>sql-app.infocruncher.com</a>\n\n" +
+        "I'm an app that extracts table and\ncolumn info from SQL queries using the\n<a href='https://github.com/macbre/sql-metadata'>sql-metadata</a> library\n\n" +
+        "Source code available:\n<a href='https://github.com/dylanhogg/sql-app'>github.com/dylanhogg/sql-app</a>";
+        $("#response").html(about)
         return false;
-      }
     });
+
+//    $("#input-text").keypress(function (e) {
+//      if (e.which == 13) {
+//        $("#input-button").click();
+//        return false;
+//      }
+//    });
 
     $("#input-button").click(function(){
         $("#debug-response").html("");
@@ -40,7 +51,8 @@ $(document).ready(function () {
 
         var input = $("#input-text").val();
         if (input.length == 0) {
-            $("#response").html("Sql input is empty.<br />Experiment with the Random button.");
+            $("#response").html("Sql input is empty<br /><br />Experiment by clicking the Random button");
+            $("#loader").removeClass("loader");
             return;
         }
 
@@ -54,7 +66,7 @@ $(document).ready(function () {
         $.ajax({
            type: "POST",
            url: predictionUrl,
-           data: '{"query": "'+input+'"}',
+           data: '{"query": "'+input.replace(/(\r\n|\n|\r)/gm, " ") +'"}',
            tryCount : 0,
            retryLimit : 1,
            success: function(data)
@@ -65,11 +77,14 @@ $(document).ready(function () {
                var time = end - start;
 
                var response = "<table class='response'>";
+               response += "<tr><th>Key</th><th>Value(s)</th></tr>";
                var segments = data["result"];
                for (var key in segments){
                  var key_display = key.replace(/_/g, " ");
                  key_display = key_display.charAt(0).toUpperCase() + key_display.slice(1);
-                 response += "<tr><td>" + key_display + "</td><td>" + segments[key] + "</td></tr>";
+                 values = segments[key] == null ? "" : segments[key].toString().split(",").join("\n");
+                 if (values != null && values != "")
+                    response += "<tr><td>" + key_display + "</td><td>" + values + "</td></tr>";
                }
                response += "</table>";
                $("#response").html(response)
@@ -93,7 +108,7 @@ $(document).ready(function () {
                var time = end - start;
 
                $("#loader").removeClass("loader");
-               $("#response").html("Oops, something went wrong<br />Please try again")
+               $("#response").html("Oops, I didn't understand that<br /><br />Please check you entered valid SQL")
 
                var debugInfo = "\nDEBUG INFO:\nClient timing: " + time + "\n"
                                             + "Retries: "+this.tryCount+"\n"

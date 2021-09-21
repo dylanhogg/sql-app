@@ -64,6 +64,10 @@ table td {
   text-decoration: none;
 }
 
+#source-info #view-about-info {
+  text-decoration: none;
+}
+
 .loader {
   border: 4px solid #f3f3f3;
   border-radius: 50%;
