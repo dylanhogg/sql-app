@@ -5,7 +5,8 @@ const randomInputs = [
         "SELECT * FROM foo LIMIT 10 OFFSET 100",
         "SELECT a.* FROM product_a.users AS a\nJOIN product_b.users AS b\nON a.ip_address = b.ip_address",
         "SELECT t1.*, t2.* FROM table1 t1\nLEFT JOIN table2 t2 on t1.id = t2.id",
-        "SELECT f.test FROM foo AS f"
+        "SELECT f.test FROM foo AS f",
+        "SELECT u.id as userid, u.name, ud.address\nFROM User u\nLEFT JOIN UserDetail ud ON u.id = ud.id\nLIMIT 100 OFFSET 10"
     ]
 
 var predict_count = 0;
