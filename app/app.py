@@ -7,7 +7,7 @@ from library.classes import ApiResult, SafeDict
 from sql_metadata import Parser
 
 runtime_start = datetime.now()
-app_version = "0.0.1"
+app_version = "1.0.0"
 allow_origin = "*"   # TODO: lockdown Access-Control-Allow-Origin value below?
 dynamodb_table = "SqlParserInferenceFunctionUsage"
 
@@ -33,7 +33,7 @@ def handle_api_event(event, handler_start) -> ApiResult:
         raise Exception("query key not found in event body")
 
     # TODO: handle multiple query inputs
-    query = data["query"].strip()
+    query = data["query"].strip().replace("\n", " ").replace("\r", " ").replace("\t", " ")
 
     if len(query) == 0:
         raise Exception("Quert is empty")
@@ -42,19 +42,20 @@ def handle_api_event(event, handler_start) -> ApiResult:
     if query == "SimulateError":
         raise Exception("Simulate error")
 
-    max_query_length = 500
+    max_query_length = 1000
     if len(query) > max_query_length:
         raise Exception(f"query length must be less than {max_query_length} chars")
 
     parser = Parser(query)
-    column_names = parser.columns
-    column_aliases = parser.columns_aliases_names
-    table_names = parser.tables
-    # TODO: more extraction types...
+
+    # TODO: add more extraction types...
     result = {
-        "column_names": column_names,
-        "column_aliases": column_aliases,
-        "table_names": table_names
+        "table_names": parser.tables,
+        "column_names": parser.columns,
+        "column_aliases": parser.columns_aliases_names,
+        "limit_offset": parser.limit_and_offset,
+        "values": parser.values_dict,
+        "subqueries_names": parser.subqueries_names,
     }
 
     handler_time = str(datetime.now() - handler_start)
