@@ -87,7 +87,7 @@ sam-deploy:
 	--confirm-changeset
 
 ### AWS SAM deploy application (no confirmation)
-sam-deploy:
+sam-deploy-no-confirm:
 	sam deploy \
 	--profile ${PROFILE} \
 	--config-env ${PROFILE} \
