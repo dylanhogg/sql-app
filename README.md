@@ -6,6 +6,7 @@ This project has an api and application to extracts table and column info from S
 
 It uses the excellent [sql-metadata](https://github.com/macbre/sql-metadata) library under the hood. 
 
+![demo](docs/app-image.png)
 
 ## Working examples
 
